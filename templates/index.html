@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Content Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 30px;
+        }
+
+        form {
+            background: #fff;
+            padding: 25px 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        textarea,
+        select,
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            display: block;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 200px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            color: #555;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 260px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            /* Position above the icon */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <form id="thumbnailMaker">
+        <h2>Open Thumbnail Maker</h2>
+        <a href="thumbnail" target="_blank">Open Thumbnail Maker</a>
+        (Opens in new tab)
+    </form>
+
+    <br>
+    <form id="runVideoEditor">
+        <h2>Bulk Video Editor</h2>
+        <div> To be used to slow (pixverse) video speed to increase length. Cut portion of video to remove watermark. Add own watermark. Add background audio.
+              <br><br>Place the input mp4 files in edit_vid_input folder. Output files will be created in edit_vid_output.
+        </div>
+        <br>
+        <label>Orientation:</label>
+        <select name="orientation">
+            <option value="auto">auto</option>
+            <option value="landscape">landscape</option>
+            <option value="portrait">portrait</option>
+        </select>
+
+        <label>Background Music:</label>
+        <select name="bgmusic">
+            <option value="none">none</option>
+            <option value="god_bg">Random from folder god_bg</option>
+        </select>
+
+        <label>Remove from Top(leave blank/50/60):</label>
+        <input type="number" name="topcut" >
+
+        <label>Remove from bottom(leave blank/50/60):</label>
+        <input type="number" name="bottomcut" >
+
+        <label>Slow down video by factor (leave blank/2,3):</label>
+        <input type="number" name="slowfactor" >
+
+        <!-- <label>Watermark:</label>
+        <select name="watermark">
+            <option value="none">none</option>
+            <option value="logo.png">logo.png</option>
+        </select> -->
+
+        <label>Watermark position:</label>
+        <select name="watermarkposition">
+            <option value="none">none</option>
+            <option value="bottom-left">bottom-left</option>
+            <option value="bottom-right">bottom-right</option>
+            <option value="top-left">top-left</option>
+            <option value="top-right">top-right</option>            
+        </select>
+
+        <button type="submit">Process Videos</button>
+    </form>    
+    <br>
+    <form id="addOverlay">
+        <h2>Add Overlay</h2>
+        <div> To be used to add flower petals/sparkle on the video.
+              <br><br>Place the input mp4 files in edit_vid_input folder. Output files will be created in edit_vid_output.
+        </div>
+        <br>
+        <label>Add Petals:</label>
+        <select name="add_petals">
+            <option value="no">no</option>
+            <option value="yes">yes</option>
+        </select>
+
+        <label>Add Sparkles:</label>
+        <select name="add_sparkles">
+            <option value="no">no</option>
+            <option value="yes">yes</option>
+        </select>
+ 
+        <button type="submit">Process Videos</button>
+    </form>    
+
+    <script>
+       
+        function updateVoices() {
+            const gender = document.getElementById("gender").value;
+            const voiceDropdown = document.getElementById("voice");
+            const voiceList = voices[gender];
+
+            voiceDropdown.innerHTML = '';
+            voiceList.forEach(function (v) {
+                const opt = document.createElement("option");
+                opt.value = v;
+                opt.text = v;
+                voiceDropdown.appendChild(opt);
+            });
+        }
+
+        // On page load, initialize voices for default gender
+        //window.onload = updateVoices;
+
+        // document.getElementById('contentForm').onsubmit = async function (e) {
+        //     e.preventDefault();
+        //     console.log("Processing request...");
+        //     const formData = new FormData(this);
+        //     const response = await fetch('/process', {
+        //         method: 'POST',
+        //         body: formData
+        //     });
+        //     const result = await response.text();
+        //     console.log("Completed Processing");
+        //     // alert(result);
+        // };
+
+        // document.getElementById('runCaptionGenerator').onsubmit = async function (e) {
+        //     e.preventDefault();
+        //     console.log("Processing request...caption");
+        //     const formData = new FormData(this);
+        //     const response = await fetch('/caption', {
+        //         method: 'POST',
+        //         body: formData
+        //     });
+        //     const result = await response.text();
+        //     console.log("Completed creating caption");
+        //     // alert(result);
+        // };
+        // document.getElementById('uploadToYoutube').onsubmit = async function (e) {
+        //     e.preventDefault();
+        //     console.log("Processing request...upload_videos");
+        //     const response = await fetch('/upload', {
+        //         method: 'POST'
+        //     });
+        //     const result = await response.text();
+        //     console.log("Completed upload");
+        //     // alert(result);
+        // };
+        // document.getElementById('runOBSRecorder').onsubmit = async function (e) {
+        //     e.preventDefault();
+        //     console.log("Processing request...run OBS recorder");
+        //     const formData = new FormData(this);
+        //     const response = await fetch('/runobsrecorder', {
+        //         method: 'POST',
+        //         body: formData
+        //     });
+        //     console.log("Completed OBS recorder run");
+        //     const result = await response.text();
+        //     // alert(result);
+        // };
+        
+        document.getElementById('runVideoEditor').onsubmit = async function (e) {
+            e.preventDefault();
+            console.log("Processing request...edit Videos");
+            const formData = new FormData(this);
+            const response = await fetch('/editvideos', {
+                method: 'POST',
+                body: formData
+            });
+            console.log("Completed ..edit Videos");
+            const result = await response.text();
+            // alert(result);
+        };
+
+        document.getElementById('addOverlay').onsubmit = async function (e) {
+            e.preventDefault();
+            console.log("Processing request...add overlay");
+            const formData = new FormData(this);
+            const response = await fetch('/addoverlays', {
+                method: 'POST',
+                body: formData
+            });
+            console.log("Completed add overlay");
+            const result = await response.text();
+            // alert(result);
+        };
+    </script>
+</body>
+
+</html>
